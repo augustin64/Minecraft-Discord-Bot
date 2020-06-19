@@ -1,2 +1,2 @@
 # Minecraft-Discord-Bot
-discord bot about Minecraft, using discord py librar
+discord bot about Minecraft commands, using discord py library
