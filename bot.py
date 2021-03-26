@@ -9,14 +9,14 @@ import time
 import csv
 import discord
 from discord.ext import commands
+import requests
+from bs4 import BeautifulSoup
 
 TOKEN = 'My_Token_Here'
 
 description = '''Bot Python to help you in Minecraft command edit'''
 bot = commands.Bot(command_prefix='Mc!', description=description)
 bot.remove_command('help')
-
-
 
 
 @bot.event
@@ -62,34 +62,14 @@ async def on_ready():
 
 @bot.event
 async def on_guild_join(guild):
-    
-    j = " "
-    
-    for i in guild.channels :
-        if i.name == "general" or i.name == "général" :
-            j = i
-            break
-    
-    to_send = "Hello everyone, \nI'm here to help you in your minecraft projects.\n```Mc!help for more infos```"
-        
-    if j != " " :
-        await j.send(to_send)
-    else :
-        for i in guild.channels :
-            break
-        await i.send(to_send)
-
-    print("-----\nNouveau Serveur rejoint :",guild.name,"\n-----")
-    
     table = []
     lecteur=csv.reader(open('./data/language.csv','r',encoding='utf-8'))
     for ligne in lecteur:
         table.append(ligne)
-    
-    
-    for guildofthebot in bot.guilds :
-        if not ( guildofthebot in table ) :
-            table.append([str(guildofthebot),"en"])
+
+        for guildofthebot in bot.guilds :
+            if not ( guildofthebot in table ) :
+                table.append([str(guildofthebot),"en"])
     
     doc = open("./data/language.csv" , "w", encoding="utf-8")
     doc.write("")
@@ -107,11 +87,19 @@ async def on_guild_join(guild):
         doc.write("\n")
     doc.close()
 
-
-
-
-
-
+    j = " "
+    for i in guild.channels :
+        if i.name == "general" or i.name == "général" :
+            j = i
+            break
+    to_send = "Hello everyone, \nI'm here to help you in your minecraft projects.\n```Mc!help for more infos```"
+    if j != " " :
+        await j.send(to_send)
+    else :
+        for i in guild.channels :
+            break
+        await i.send(to_send)
+    print("-----\nNouveau Serveur rejoint :",guild.name,"\n-----")
 
 
 class Help() :
@@ -121,11 +109,7 @@ class Help() :
     async def help(ctx,*command) :
         """returns help message"""
         
-        
-        
         if len(command) == 0 :
-            
-
             
             table = []
             lecteur=csv.reader(open('./data/language.csv','r',encoding='utf-8'))
@@ -136,8 +120,6 @@ class Help() :
                 if str(ctx.guild.id) == i[0] :
                     lang = i[1]
                     
-            
-                
             if lang == "fr" :
                 
         
@@ -148,10 +130,10 @@ class Help() :
                 embed.set_author(name='Categorie Aide :')
                 embed.add_field(name='Mc!help', value = 'Renvoie ce message', inline = False)
                 embed.add_field(name='Mc!add', value = 'En développement, ne pas utiliser', inline = False)
-                embed.add_field(name='Mc!doc', value = 'Renvoie la documentation Minecraft de la commande selectionnée', inline = False)
-                embed.add_field(name='Mc!doclist', value = 'Return la liste des commandes disponibles pour la commande Mc!doc <command>', inline = False)
+                embed.add_field(name='Mc!doc', value = 'Renvoie la documentation Minecraft du mot-clé selectionné', inline = False)
+                embed.add_field(name='Mc!doclist', value = 'Renvoie la liste des mots-clés disponibles pour la commande Mc!doc <command>', inline = False)
                 embed.add_field(name='Mc!search', value = "Comme une recherche Internet, mais avec des commandes Minecraft (En utilisant non pas le nom des commandes, mais des mots clés)", inline = False)
-                embed.add_field(name='Mc!taglist', value = 'Returne la liste des tags disponibles pour la commande Mc!search <command>', inline = False)
+                embed.add_field(name='Mc!taglist', value = 'Renvoie la liste des tags disponibles pour la commande Mc!search <command>', inline = False)
         
                 embed1 = discord.Embed(
                     colour = discord.Colour.blue()
@@ -167,7 +149,7 @@ class Help() :
         
                 await ctx.send( embed=embed )
                 await ctx.send( embed=embed1 )
-                await ctx.send( "Taper `Mc!help <command>` pour plus d'infos sur une commande (:grin: Maintenant disponible !)" )
+                await ctx.send( "Taper `Mc!help <command>` pour plus d'infos sur une commande" )
                 
             else :
         
@@ -178,8 +160,8 @@ class Help() :
                 embed.set_author(name='Category Help :')
                 embed.add_field(name='Mc!help', value = 'Return this message', inline = False)
                 embed.add_field(name='Mc!add', value = 'In developpment, do not use', inline = False)
-                embed.add_field(name='Mc!doc', value = 'Return the minecraft documentation of the selected command', inline = False)
-                embed.add_field(name='Mc!doclist', value = 'Return the list of all Minecraft commands available for the Mc!doc command', inline = False)
+                embed.add_field(name='Mc!doc', value = 'Return the minecraft documentation of the selected keyword', inline = False)
+                embed.add_field(name='Mc!doclist', value = 'Return the list of all Minecraft keywords available for the Mc!doc command', inline = False)
                 embed.add_field(name='Mc!search', value = "As an internet research, but with minecraft commands (using tags, not command's names)", inline = False)
                 embed.add_field(name='Mc!taglist', value = 'Return the list of all the tags you can use in the Mc!search command', inline = False)
         
@@ -223,10 +205,10 @@ class Help() :
             if lang == "fr" :
             
                 Help_dict["add"] = ("Ne pas Utiliser","Pas encore disponible")
-                Help_dict["doc"] = ("Mc!doc <Minecraft Command Name>","Renvoie la documentation Minecraft de la commande selectionnée")
-                Help_dict["doclist"] = ("Mc!doclist","Return la liste des commandes disponibles pour la commande `Mc!doc <command>`")
+                Help_dict["doc"] = ("Mc!doc <Minecraft Command Name>","Renvoie la documentation Minecraft du mot-clé selectionné")
+                Help_dict["doclist"] = ("Mc!doclist","Renvoie la liste des mots-clés disponibles pour la commande `Mc!doc <command>`")
                 Help_dict["search"] = ("Mc!search <tag1> [tag2] [tag3] [tag4] [tag5]","Comme une recherche Internet, mais avec des commandes Minecraft (En utilisant non pas le nom des commandes, mais des mots clés)\n`Mc!taglist` vous donnera la liste des tags disponibles")
-                Help_dict["taglist"] = ("Mc!taglist","Returne la liste des tags disponibles pour la commande Mc!search <command>")
+                Help_dict["taglist"] = ("Mc!taglist","Renvoie la liste des tags disponibles pour la commande Mc!search <command>")
                 
                 Help_dict["info"] = ("Mc!info","Informations utiles")
                 Help_dict["invite"] = ("Mc!invite","Obtenir un lien d'invitation")
@@ -237,8 +219,8 @@ class Help() :
             else :
                 
                 Help_dict["add"] = ("Do not use","Work In Progress")
-                Help_dict["doc"] = ("Mc!doc <Minecraft Command Name>","Return the minecraft documentation of the selected command")
-                Help_dict["doclist"] = ("Mc!doclist","Return the list of all Minecraft commands available for the `Mc!doc` command")
+                Help_dict["doc"] = ("Mc!doc <Minecraft Command Name>","Return the minecraft documentation of the selected keyword")
+                Help_dict["doclist"] = ("Mc!doclist","Return the list of all Minecraft keywords available for the `Mc!doc` command")
                 Help_dict["search"] = ("Mc!search <tag1> [tag2] [tag3] [tag4] [tag5]","Like an internet research, but with minecraft commands\n`Mc!taglist` gives you the list of availables tags")
                 Help_dict["taglist"] = ("Mc!taglist","Return the list of all the tags you can use in the `Mc!search` command")
                 
@@ -373,6 +355,46 @@ class Help() :
         
         await ctx.send(list_of_commands)
     
+
+    @bot.command(pass_context = True,category = "Help")
+    async def exemple(ctx,*Nom_de_la_Commande):
+        """Return a minecraft exemple for the selected command"""
+        cmd = Nom_de_la_Commande[0]
+
+        table = []
+        lecteur=csv.reader(open('./data/language.csv','r',encoding='utf-8'))
+        for ligne in lecteur:
+            table.append(ligne)
+        
+        for i in table :
+            if str(ctx.guild.id) == i[0] :
+                lang = i[1]
+
+        url = "https://fr-minecraft.net/commande-"+cmd+".html"
+        r = requests.get(url)
+        soup = BeautifulSoup(r.content.decode('utf-8','ignore'), 'html.parser')
+
+        examples = str(soup.find_all("div", class_="cmd_exemple")[0])
+
+        exsoup = BeautifulSoup(examples, 'html.parser')
+        commands = [i.text for i in exsoup.find_all("textarea", class_="input-exemple")]
+        comments = [i for i in examples.split('<br/>') if '</' not in i ]
+        print(comments)
+        print(commands)
+
+        embed = discord.Embed(
+                    colour = discord.Colour.orange()
+                )
+        
+        embed.set_author(name="🔧 Exemples pour la commande "+cmd)
+        
+
+        for i in range(len(comments)):
+            embed.add_field(name='`'+commands[i]+'`', value = comments[i], inline = False)
+
+        await ctx.send(embed=embed)
+
+
     @bot.command(pass_context = True,category = "Help")
     async def doc(ctx,*Nom_de_la_Commande):
         """Return the minecraft documentation of the selected command"""
@@ -395,38 +417,27 @@ class Help() :
                 if i != " " and i != "/" :
                     com = com + i.lower()
             
-            doc = open('./data/commands.txt','r',encoding='utf-8')
-    
-            docu = doc.read()
-            docu = eval(docu)
-            
-            doc.close()
-            
-            if com in docu :
+            url = "https://fr-minecraft.net/commande-"+com+".html"
+
+            r = requests.get(url)
+            soup = BeautifulSoup(r.content.decode('utf-8','ignore'), 'html.parser')
+            cmd_syntax = soup.find_all("div", class_="cmd-syntaxe")[0]
+            docu=cmd_syntax.text.split("Légende")[0].replace('\n'," ").replace('\r',"").replace('Syntaxe : ',"")
+            description = soup.find_all("div", class_="description")[0].text
+
+            if description != "" :
                 
-                if str(type(docu[com])) == "<class 'str'>" :
+                if str(type(docu)) == "<class 'str'>" :
                 
                     if lang == 'fr' : 
-                        to_return = ":books: Voici la documentation de la commande */" + com + "* :```" + docu[com] + "```"
+                        to_return = ":books: Voici la documentation du mot-clé *" + com + "* :```" + docu + "```" + description
                         
                     else : 
-                        to_return = ":books: Here is the documentation of the */" + com + "* command :```" + docu[com] + "```"
+                        to_return = ":books: Here is the documentation of the *" + com + "* keyword :```" + docu + "```" + description
                         
                     await ctx.send(to_return)
-                    
-                elif str(type(docu[com])) == "<class 'tuple'>" :
-                    
-                    if lang == 'fr' : 
-                        to_return = ":books: Voici la documentation de la commande */" + com + "* :```" + docu[com][0] + "```"
-                        
-                    else : 
-                        to_return = ":books: Here is the documentation of the */" + com + "* command :```" + docu[com][0] + "```"
-    
-                    to_return = to_return + docu[com][1]
-            
-                    await ctx.send(to_return)
-                
-                else : await ctx.send(type(docu[com]))
+
+                else : await ctx.send("error: ",type(docu))
                 
                 doc = open('./data/Help.txt','r',encoding='utf-8')
             
@@ -453,7 +464,11 @@ class Help() :
                     await ctx.send("Nothing Found")
                 print("-----\nRessource non trouvée\n-----")
                 
-        else : await ctx.send("Please enter at least one argument `Mc!help doc` for more help")
+        else : 
+            if lang == 'fr' :
+                await ctx.send("Merci de rentrer au oins un argument, `Mc!help doc` pour plus d'informations")
+            else : 
+                await ctx.send("Please enter at least one argument `Mc!help doc` for more help")
         
     @bot.command(pass_context = True,category = "Help")
     async def search(ctx, *tags):
