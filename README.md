@@ -7,9 +7,9 @@ discord bot about Minecraft commands, using discord py library
 * you can also [join](https://discord.gg/j3CjjnjCkc) our community server to ask questions and suggest features
 
 ### Self Hosting
-###### Requirements :
+##### Requirements :
 * python3
-######## pip modules :
+###### pip modules :
 * discord.py
 * BeautifulSoup4
 * requests
