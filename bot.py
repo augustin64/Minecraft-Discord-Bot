@@ -378,7 +378,7 @@ class Help() :
 
         exsoup = BeautifulSoup(examples, 'html.parser')
         commands = [i.text for i in exsoup.find_all("textarea", class_="input-exemple")]
-        comments = [i for i in examples.split('<br/>') if '</' not in i ]
+        comments = [BeautifulSoup(i, 'html.parser').text for i in examples.split('<br/>') if "<textarea" not in i and BeautifulSoup(i, 'html.parser').text != '']
         print(comments)
         print(commands)
 
@@ -430,10 +430,10 @@ class Help() :
                 if str(type(docu)) == "<class 'str'>" :
                 
                     if lang == 'fr' : 
-                        to_return = ":books: Voici la documentation du mot-clé *" + com + "* :```" + docu + "```" + description
+                        to_return = ":books: Voici la documentation de la commande */" + com + "* :```" + docu + "```" + description
                         
                     else : 
-                        to_return = ":books: Here is the documentation of the *" + com + "* keyword :```" + docu + "```" + description
+                        to_return = ":books: Here is the documentation of the */" + com + "* command :```" + docu + "```" + description
                         
                     await ctx.send(to_return)
 
